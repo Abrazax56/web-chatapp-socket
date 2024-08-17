@@ -21,8 +21,7 @@ async function main() {
     const allowedOrigins: string = CLIENT_URL;
 
     const options: cors.CorsOptions = {
-        origin: allowedOrigins,
-        credentials: true
+        origin: allowedOrigins
     };
 
     web.use(cors(options));
