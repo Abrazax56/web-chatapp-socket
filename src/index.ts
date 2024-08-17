@@ -14,11 +14,19 @@ async function main() {
     const server = createServer(web);
     const io: Server = new Server(server, {
         cors: {
-            origin: CLIENT_URL,
+            origin: [
+                CLIENT_URL,
+                'http://localhost:5173',
+                'http://localhost:8159'
+            ],
             methods: ['GET', 'POST']
         }
     });
-    const allowedOrigins: string = CLIENT_URL;
+    const allowedOrigins: Array<string> = [
+        CLIENT_URL,
+        'http://localhost:5173',
+        'http://localhost:8159'
+    ];
 
     const options: cors.CorsOptions = {
         origin: allowedOrigins

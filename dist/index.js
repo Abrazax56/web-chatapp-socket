@@ -27,14 +27,21 @@ function main() {
         const server = (0, http_1.createServer)(web);
         const io = new socket_io_1.Server(server, {
             cors: {
-                origin: CLIENT_URL,
+                origin: [
+                    CLIENT_URL,
+                    'http://localhost:5173',
+                    'http://localhost:8159'
+                ],
                 methods: ['GET', 'POST']
             }
         });
-        const allowedOrigins = CLIENT_URL;
+        const allowedOrigins = [
+            CLIENT_URL,
+            'http://localhost:5173',
+            'http://localhost:8159'
+        ];
         const options = {
-            origin: allowedOrigins,
-            credentials: true
+            origin: allowedOrigins
         };
         web.use((0, cors_1.default)(options));
         web.use(express_1.default.json());
