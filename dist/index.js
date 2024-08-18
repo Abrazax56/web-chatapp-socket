@@ -48,7 +48,10 @@ function main() {
         const changeStream = schema_1.messages.watch();
         changeStream.on('change', change => {
             console.info('Database Change Detected:', change);
-            io.emit('data_updated', change.fullDocument);
+            if (change.operationType === 'insert')
+                io.emit('data_updated', change.fullDocument);
+            if (change.operationType === 'delete')
+                io.emit('data_deleted');
         });
         server.listen(PORT, () => {
             console.info('app running on port ' + PORT);

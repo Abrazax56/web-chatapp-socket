@@ -39,7 +39,9 @@ async function main() {
 
     changeStream.on('change', change => {
         console.info('Database Change Detected:', change);
-        io.emit('data_updated', change.fullDocument);
+        if (change.operationType === 'insert')
+            io.emit('data_updated', change.fullDocument);
+        if (change.operationType === 'delete') io.emit('data_deleted');
     });
 
     server.listen(PORT, () => {
