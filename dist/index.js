@@ -51,7 +51,7 @@ function main() {
             if (change.operationType === 'insert')
                 io.emit('data_updated', change.fullDocument);
             if (change.operationType === 'delete')
-                io.emit('data_deleted');
+                io.emit('data_deleted', change.documentKey._id.toString());
         });
         server.listen(PORT, () => {
             console.info('app running on port ' + PORT);
