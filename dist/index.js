@@ -54,10 +54,13 @@ function main() {
             }
         });
         schema_1.users.watch().on('change', change => {
+            var _a;
             switch (change.operationType) {
                 case 'update':
-                    console.info('emiting user_status to client');
-                    io.emit('user_status', change.documentKey._id.toString());
+                    if ((_a = change.updateDescription.updatedFields) === null || _a === void 0 ? void 0 : _a.status) {
+                        console.info('emiting user_status to client');
+                        io.emit('user_status', change.documentKey._id.toString());
+                    }
                     break;
             }
         });

@@ -47,8 +47,10 @@ async function main() {
     users.watch().on('change', change => {
         switch (change.operationType) {
             case 'update':
-                console.info('emiting user_status to client');
-                io.emit('user_status', change.documentKey._id.toString());
+                if (change.updateDescription.updatedFields?.status) {
+                    console.info('emiting user_status to client');
+                    io.emit('user_status', change.documentKey._id.toString());
+                }
                 break;
         }
     });
