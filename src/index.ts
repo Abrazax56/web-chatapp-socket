@@ -55,31 +55,37 @@ async function main() {
         }
     });
 
-    io.on('connection', socket => {
+    const userConnection: { [key: string]: number } = {} as {
+        [key: string]: number;
+    };
+
+    io.on('connection', async socket => {
         console.info('connected to client');
-        socket.on('user_online', async (user_id: string) => {
-            console.info(`user with id : ${user_id} is now online`);
-            const response = await users.updateOne(
+        const user_id: string = socket.handshake.query.user_id as string;
+
+        if (!userConnection) (userConnection[user_id] as number) = 0;
+        userConnection[user_id]++;
+
+        if (userConnection[user_id] === 1)
+            await users.updateOne(
                 { user_id },
                 {
                     status: 'online'
                 }
             );
-            console.log(response);
-        });
 
-        socket.on('user_offline', async (user_id: string) => {
-            console.info(`user with id : ${user_id} is now offline`);
-            const response = await users.updateOne(
-                { user_id },
-                {
-                    status: 'offline'
-                }
-            );
-            console.log(response);
-        });
+        socket.on('disconnect', async () => {
+            console.log('disconnected from client');
+            userConnection[user_id]--;
 
-        socket.on('disconnect', () => console.log('disconnected from client'));
+            if (userConnection[user_id] === 0)
+                await users.updateOne(
+                    { user_id },
+                    {
+                        status: 'offline'
+                    }
+                );
+        });
     });
 
     server.listen(PORT, () => {

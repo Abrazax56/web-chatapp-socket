@@ -64,24 +64,26 @@ function main() {
                     break;
             }
         });
-        io.on('connection', socket => {
+        const userConnection = {};
+        io.on('connection', (socket) => __awaiter(this, void 0, void 0, function* () {
             console.info('connected to client');
-            socket.on('user_online', (user_id) => __awaiter(this, void 0, void 0, function* () {
-                console.info(`user with id : ${user_id} is now online`);
-                const response = yield schema_1.users.updateOne({ user_id }, {
+            const user_id = socket.handshake.query.user_id;
+            if (!userConnection)
+                userConnection[user_id] = 0;
+            userConnection[user_id]++;
+            if (userConnection[user_id] === 1)
+                yield schema_1.users.updateOne({ user_id }, {
                     status: 'online'
                 });
-                console.log(response);
+            socket.on('disconnect', () => __awaiter(this, void 0, void 0, function* () {
+                console.log('disconnected from client');
+                userConnection[user_id]--;
+                if (userConnection[user_id] === 0)
+                    yield schema_1.users.updateOne({ user_id }, {
+                        status: 'offline'
+                    });
             }));
-            socket.on('user_offline', (user_id) => __awaiter(this, void 0, void 0, function* () {
-                console.info(`user with id : ${user_id} is now offline`);
-                const response = yield schema_1.users.updateOne({ user_id }, {
-                    status: 'offline'
-                });
-                console.log(response);
-            }));
-            socket.on('disconnect', () => console.log('disconnected from client'));
-        });
+        }));
         server.listen(PORT, () => {
             console.info('app running on port ' + PORT);
         });
