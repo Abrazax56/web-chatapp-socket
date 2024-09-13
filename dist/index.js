@@ -27,38 +27,57 @@ function main() {
         const server = (0, http_1.createServer)(web);
         const io = new socket_io_1.Server(server, {
             cors: {
-                origin: [
-                    CLIENT_URL,
-                    'http://localhost:5173',
-                    'http://localhost:8159'
-                ],
+                origin: [CLIENT_URL],
                 methods: ['GET', 'POST']
             }
         });
-        const allowedOrigins = [
-            CLIENT_URL,
-            'http://localhost:5173',
-            'http://localhost:8159'
-        ];
+        const allowedOrigins = [CLIENT_URL];
         const options = {
             origin: allowedOrigins
         };
         web.use((0, cors_1.default)(options));
         web.use(express_1.default.json());
-        const changeStream = schema_1.messages.watch();
-        changeStream.on('change', change => {
-            console.info('Database Change Detected:', change);
+        schema_1.messages.watch().on('change', change => {
             switch (change.operationType) {
                 case 'insert':
+                    console.info('emiting data_updated to client');
                     io.emit('data_updated', change.fullDocument);
                     break;
                 case 'delete':
+                    console.info('emiting data_deleted to client');
                     io.emit('data_deleted', change.documentKey._id.toString());
                     break;
                 case 'update':
+                    console.info('emiting message_readed to client');
                     io.emit('message_readed', change.documentKey._id.toString());
                     break;
             }
+        });
+        schema_1.users.watch().on('change', change => {
+            switch (change.operationType) {
+                case 'update':
+                    console.info('emiting user_status to client');
+                    io.emit('user_status', change.documentKey._id.toString());
+                    break;
+            }
+        });
+        io.on('connection', socket => {
+            console.info('connected to client');
+            socket.on('user_online', (user_id) => __awaiter(this, void 0, void 0, function* () {
+                console.info(`user with id : ${user_id} is now online`);
+                const response = yield schema_1.users.updateOne({ user_id }, {
+                    status: 'online'
+                });
+                console.log(response);
+            }));
+            socket.on('user_offline', (user_id) => __awaiter(this, void 0, void 0, function* () {
+                console.info(`user with id : ${user_id} is now offline`);
+                const response = yield schema_1.users.updateOne({ user_id }, {
+                    status: 'offline'
+                });
+                console.log(response);
+            }));
+            socket.on('disconnect', () => console.log('disconnected from client'));
         });
         server.listen(PORT, () => {
             console.info('app running on port ' + PORT);

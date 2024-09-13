@@ -23,28 +23,32 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.messages = void 0;
+exports.messages = exports.users = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
-const MessageSchema = new mongoose_1.Schema({
-    message_id: {
-        type: String,
-        required: true
-    },
-    sender_id: {
-        type: String,
-        required: true
-    },
-    receiver_id: {
-        type: String,
-        required: true
-    },
-    message_text: {
-        type: String,
-        required: true
-    },
-    message_timestamp: {
-        type: String,
-        required: true
-    }
+const MessageQuotedSchema = new mongoose_1.Schema({
+    message_text: { type: String, required: false },
+    from_name: { type: String, required: false },
+    message_id: { type: String, required: false }
 });
+const MessageSchema = new mongoose_1.Schema({
+    message_id: { type: String, required: true },
+    sender_id: { type: String, required: true },
+    receiver_id: { type: String, required: true },
+    message_text: { type: String, required: true },
+    message_timestamp: { type: String, required: true },
+    is_readed: { type: Boolean, required: true },
+    read_at: { type: String, required: false },
+    message_quoted: { type: MessageQuotedSchema, required: false }
+});
+const UserSchema = new mongoose_1.Schema({
+    user_id: { type: String, required: true },
+    wa_number: { type: String, required: true },
+    name: { type: String, required: true },
+    created_at: { type: String, required: true },
+    update_at: { type: String, required: true },
+    role: { type: String, required: true },
+    pp: { type: String, required: true },
+    status: { type: String, required: true }
+});
+exports.users = mongoose_1.default.model('users', UserSchema);
 exports.messages = mongoose_1.default.model('messages', MessageSchema);
