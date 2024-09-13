@@ -61,9 +61,11 @@ async function main() {
 
     io.on('connection', async socket => {
         console.info('connected to client');
-        const user_id: string = socket.handshake.query.user_id as string;
+        const user_id: string = socket?.handshake?.query?.user_id as string;
 
-        if (!userConnection) (userConnection[user_id] as number) = 0;
+        if (!user_id) return;
+
+        if (!userConnection[user_id]) (userConnection[user_id] as number) = 0;
         userConnection[user_id]++;
 
         if (userConnection[user_id] === 1)

@@ -66,9 +66,12 @@ function main() {
         });
         const userConnection = {};
         io.on('connection', (socket) => __awaiter(this, void 0, void 0, function* () {
+            var _a, _b;
             console.info('connected to client');
-            const user_id = socket.handshake.query.user_id;
-            if (!userConnection)
+            const user_id = (_b = (_a = socket === null || socket === void 0 ? void 0 : socket.handshake) === null || _a === void 0 ? void 0 : _a.query) === null || _b === void 0 ? void 0 : _b.user_id;
+            if (!user_id)
+                return;
+            if (!userConnection[user_id])
                 userConnection[user_id] = 0;
             userConnection[user_id]++;
             if (userConnection[user_id] === 1)
