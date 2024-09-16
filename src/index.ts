@@ -63,8 +63,15 @@ async function main() {
         switch (change.operationType) {
             case 'update':
                 if (change.updateDescription.updatedFields?.status) {
-                    console.info('emiting user_status to client');
-                    io.emit('user_status', change.documentKey._id.toString());
+                    console.info('emiting user status to client');
+                    io.emit(
+                        'user.status.on.layout',
+                        change.documentKey._id.toString()
+                    );
+                    io.emit(
+                        'user.status.on.page',
+                        change.documentKey._id.toString()
+                    );
                 }
                 break;
         }
