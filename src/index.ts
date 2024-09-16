@@ -30,16 +30,31 @@ async function main() {
     messages.watch().on('change', change => {
         switch (change.operationType) {
             case 'insert':
-                console.info('emiting data_updated to client');
-                io.emit('data_updated', change.fullDocument);
+                console.info('emiting message inserted to client');
+                io.emit('mess.insert.on.layout', change.fullDocument);
+                io.emit('mess.insert.on.page', change.fullDocument);
                 break;
             case 'delete':
-                console.info('emiting data_deleted to client');
-                io.emit('data_deleted', change.documentKey._id.toString());
+                console.info('emiting message deleted to client');
+                io.emit(
+                    'mess.delete.on.layout',
+                    change.documentKey._id.toString()
+                );
+                io.emit(
+                    'mess.delete.on.page',
+                    change.documentKey._id.toString()
+                );
                 break;
             case 'update':
-                console.info('emiting message_readed to client');
-                io.emit('message_readed', change.documentKey._id.toString());
+                console.info('emiting message updated to client');
+                io.emit(
+                    'mess.update.on.layout',
+                    change.documentKey._id.toString()
+                );
+                io.emit(
+                    'mess.update.on.page',
+                    change.documentKey._id.toString()
+                );
                 break;
         }
     });
